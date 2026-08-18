@@ -1,0 +1,47 @@
+gcloud artifacts repositories create energy-app \
+    --repository-format=docker \
+    --location=us-central1 \
+    --description="Docker repository for energy app"
+
+
+gcloud projects add-iam-policy-binding tejasproject-1543680630918 \
+  --member="user:tejasbabu11@gmail.com" \
+  --role="roles/artifactregistry.reader"
+
+PROJECT_NUMBER=$(gcloud projects describe tejasproject-1543680630918 --format='value(projectNumber)')
+
+gcloud projects add-iam-policy-binding tejasproject-1543680630918 \
+  --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+  --role="roles/artifactregistry.reader"
+
+
+PROJECT_NUMBER=$(gcloud projects describe tejasproject-1543680630918 --format='value(projectNumber)')
+
+gcloud projects add-iam-policy-binding tejasproject-1543680630918 \
+  --member="serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com" \
+  --role="roles/artifactregistry.writer"
+
+
+
+
+gcloud builds submit \
+    --tag us-central1-docker.pkg.dev/tejasproject-154368063091/energy-app/energy-flask-app:v1 .
+
+gcloud run deploy energy-flask-app \
+    --image=us-central1-docker.pkg.dev/tejasproject-154368063091/energy-app/energy-flask-app:v1 \
+    --platform=managed \
+    --region=us-central1 \
+    --allow-unauthenticated \
+    --memory=1Gi \
+    --cpu=1
+
+
+
+
+
+2.6 pandas-2.3.3 pillow-12.3.0 pyparsing-3.3.2 python-dateutil-2.9.0.post0 pytz-2026.3.post1 reportlab-5.0.0 seaborn-0.13.2 six-1.17.0 tzdata-2026.3 werkzeug-3.1.8
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+
+[notice] A new release of pip is available: 23.0.1 -> 26.2.1
+[notice] To update, run: pip install --upgrade pip
+Removing intermediate container 902e1aa74d53
