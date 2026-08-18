@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Detailed Energy Summary Report</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm 15mm;
+            background-color: #fafbfc;
+        }
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #24292e;
+            margin: 0;
+            padding: 0;
+            font-size: 11pt;
+            line-height: 1.5;
+        }
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        .header {
+            background-color: #1b2a4a;
+            color: white;
+            padding: 24px 20px;
+            margin: -20mm -15mm 25px -15mm;
+        }
+        .header h1 {
+            margin: 0 0 5px 0;
+            font-size: 20pt;
+            letter-spacing: 0.5px;
+        }
+        .header p {
+            margin: 0;
+            font-size: 10pt;
+            color: #cbd5e1;
+        }
+        .section-title {
+            font-size: 14pt;
+            color: #1b2a4a;
+            border-left: 4px solid #007bff;
+            padding-left: 8px;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            page-break-after: avoid;
+        }
+        .grid {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .stat-label {
+            font-size: 9pt;
+            color: #586069;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .stat-value {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #1b2a4a;
+            margin-top: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: #ffffff;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #e1e4e8;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-size: 10pt;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .positive { color: #16a34a; font-weight: bold; }
+        .negative { color: #dc2626; font-weight: bold; }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 9pt;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Energy Analytics & Consumption Report</h1>
+        <p>Comprehensive Total Duration, Generation, Consumption, and Net Summary</p>
+    </div>
+
+    <div class="section-title">Executive Overview</div>
+    <div class="stat-card">
+        <div class="stat-label">Analysis Timeframe</div>
+        <div class="stat-value" style="font-size: 11pt;">
+            {{ report.total_summary.start_date }} &nbsp;to&nbsp; {{ report.total_summary.end_date }}
+            ({{ report.total_summary.total_duration_days }} Days Total)
+        </div>
+    </div>
+
+    <table style="margin-bottom: 25px;">
+        <thead>
+            <tr>
+                <th>Metric</th>
+                <th>Total Value (kWh)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Total Consumption</td>
+                <td>{{ "%.2f"|format(report.total_summary.total_consumption) }} kWh</td>
+            </tr>
+            <tr>
+                <td>Total Generation</td>
+                <td>{{ "%.2f"|format(report.total_summary.total_generation) }} kWh</td>
+            </tr>
+            <tr>
+                <td><strong>Total Net Output</strong></td>
+                <td>
+                    <span class="{{ 'positive' if report.total_summary.total_net >= 0 else 'negative' }}">
+                        {{ "%.2f"|format(report.total_summary.total_net) }} kWh
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="section-title">Monthly Performance Breakdown</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Consumption (kWh)</th>
+                <th>Generation (kWh)</th>
+                <th>Net Output (kWh)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in report.monthly_breakdown %}
+            <tr>
+                <td>{{ row.month }}</td>
+                <td>{{ "%.2f"|format(row.consumption) }}</td>
+                <td>{{ "%.2f"|format(row.generation) }}</td>
+                <td class="{{ 'positive' if row.net >= 0 else 'negative' }}">
+                    {{ "%.2f"|format(row.net) }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Generated automatically by Energy Dashboard System | Detailed Monthly Report
+    </div>
+
+</body>
+</html>
